@@ -1,0 +1,37 @@
+{
+  "id": "4ca7ec2d-4fe4-4602-881f-d2d0bb38b6f9",
+  "name": "Webinar-feedbacks",
+  "description": null,
+  "default_flow": "Default",
+  "flows": [
+    {
+      "name": "Default",
+      "description": "Default custom flow",
+      "commands": []
+    }
+  ],
+  "files": [
+    {
+      "name": "logo.png",
+      "description": null
+    }
+  ],
+  "functions": [],
+  "apps": [
+    {
+      "name": "airtable",
+      "description": "Create records, and query your existing ones on Airtable",
+      "args": [
+        "method=\"getRecords\"",
+        "url=\"https://api.airtable.com/v0/id/myTable\""
+      ],
+      "runtime": "nodejs12.x",
+      "handler": "index.handler",
+      "environment": {
+        "API_KEY": ""
+      },
+      "app_id": "3eb4b835-d392-4575-8bfb-a5a1b683fd5c",
+      "version": "1.0.0"
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+start:
+  if (done) goto alreadyDone
+  say "Hello 👋, I am the chatbot in charge of asking you a few questions about the webinar."
+  say Typing(5000)
+  say "I'll be quick, I promise 😇"
+  say Typing(3000)
+  say "After answering the few questions I have, I'll give you access to my source code 🤩 !"
+  goto name
+
+
+name:
+  say Typing(5000)
+  say Question("First I'd need your name, so I know how to call you 😉",
+    buttons=[
+      Button("I rather remain anonymous", accepts=["no", "nope", "nop", "anon"]) as anon
+  ])
+  hold
+  if (event match anon) {
+    say "Ok! No problem at all, I'll just call you Anon then hehe"
+    remember fullname = "Anon"
+  } else {
+    remember fullname = event
+    say "Ok {{fullname}}, thanks!"
+  }
+  goto grade
+
+grade:
+  say Typing(5000)
+  say Question("How would you say was the webinar ?",
+    buttons=[
+      // The first argument is what will be displayed,
+      // The payload is what will be injected into the `event` variable
+      // The accepts parameter is a list of string that we will accept from the user
+      Button("⭐️", payload="1", accepts=["1"]) as btn1,
+      Button("⭐️⭐️", payload="2", accepts=["2"]) as btn2,
+      Button("⭐️⭐️⭐️", payload="3", accepts=["3"]) as btn3,
+      Button("⭐️⭐️⭐️⭐️", payload="4", accepts=["4"]) as btn4,
+      Button("⭐️⭐️⭐️⭐️⭐️", payload="5", accepts=["5"]) as btn5
+  ])
+  hold
+  if (event match btn1 || event match btn2 || event match btn3 || event match btn4 || event match btn5) {
+    remember grade = event
+    goto improvement
+  } else {
+    say "Looks like you have things on your mind, I'll ask you later, just click on one of the buttons for now ☺️"
+    goto grade
+  }
+  
+
+improvement:
+  say Typing(2000)
+  say "How do you think this webinar could be improved ?"
+  say Typing(5000)
+  say "We're always looking for way to do better 🔥"
+  hold
+  remember improvement = event
+  say OneOf(["Ok! Noted 📝", "Alright", "Got it!", "I see"])
+  goto comments
+
+comments:
+  say Typing(2000)
+  say "Do you have any other comments about the webinar or the way you'd like to use chatbots."
+  say Typing(5000)
+  say "You can tell me about your usecase if you have one for instance."
+  hold
+  remember commentsUsecase = event
+  goto reachOut
+
+reachOut:
+  say Question("Would you like a member🧑‍💻 of our team to reach out to you to talk about CSML, your usecase, or just help you out ?",
+    buttons=[
+      Button("Yes ✅", accepts=["yes", "ye", "please", "alright", "ok", "okay", "ya"]) as btnyes,
+      Button("No thanks", accepts=["no", "nope", "nop"]) as btnno
+    ])
+  hold
+  remember reachOut = event
+  if (event match btnyes) {
+    goto email
+  } else {
+    say "Ok!"
+    remember email = ""
+    goto save
+  }
+
+email:
+  say "What email address should we contact you on ?"
+  hold
+  remember email = event
+  say "Perfect! 😎"
+
+save:
+  say "Ok, I've got everything I need, thank you for your time! 🥳"
+  say Typing(3000)
+  say "As promised, you can click on the link below to find my source code 😉"
+  say Url("https://github.com/bastienbot/webinar-feedbacks", text="My source code")
+  say Typing(3000)
+  say "You can also contact my creator on contact@csml.dev"
+  say "Bye 👋"
+  remember done = 1
+  do fields = {
+    "fullname": fullname,
+    "grade": grade,
+    "improvement": improvement,
+    "commentsUsecase": commentsUsecase,
+    "reachOut": reachOut,
+    "email": email
+  }
+  do newRecord = Fn("airtable", method="createRecord", spreadsheet_id="appr1UPFFlbgikuXk", table_name="webinar20200709", fields=fields)
+  goto end
+
+alreadyDone:
+  say "I already got everything I need!"
+  say Typing(3000)
+  say "If you'd like to chat with the CSML team, you can send us an email at contact@csml.dev"
+  say Typing(5000)
+  say "You can also find my source code by clicking on the link below 😍"
+  say Url("https://github.com/bastienbot/webinar-feedbacks", text="My source code")
+  goto end
